@@ -15,7 +15,7 @@ def compare_plots(image1, image2):
     ax[0].set_title('1')
     ax[0].axis('off')
 
-    ax[1].imshow(image2)
+    ax[1].imshow(image2,  cmap='gray')
     ax[1].set_title('2')
     ax[1].axis('off')
 
