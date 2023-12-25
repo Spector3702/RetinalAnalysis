@@ -1,3 +1,5 @@
+import os
+import re
 import matplotlib.pyplot as plt
 
 
@@ -20,3 +22,21 @@ def compare_plots(image1, image2):
     ax[1].axis('off')
 
     plt.show()
+
+
+def compute_save_path(image_path, sub_name):
+    directory, filename_with_extension = os.path.split(image_path)
+    filename, extension = os.path.splitext(filename_with_extension)
+    
+    disease_match = re.search(r'(.+)_processed', directory)
+    if disease_match:
+        disease = disease_match.group(1)
+    else:
+        raise ValueError("Disease name could not be determined from the path.")
+
+    new_filename = f"{filename}_{sub_name}{extension}"
+    new_directory = directory.replace(f"{disease}_processed", f"{disease}_circled")
+    save_path = os.path.join(new_directory, new_filename)
+
+    os.makedirs(new_directory, exist_ok=True)
+    return save_path
