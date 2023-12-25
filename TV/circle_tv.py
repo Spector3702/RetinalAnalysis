@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from skimage import io, morphology, filters
 
@@ -25,11 +26,17 @@ def circle_tv(image_path):
     unit_vectors = tv_processer.get_unit_vectors(re_skeleton, 5)
     curvature_points = tv_processer.calculate_curvature_from_vectors(unit_vectors, curvature_threshold=np.pi/4)
 
+    _, filename_with_extension = os.path.split(image_path)
+    circled_ratio = len(curvature_points) / len(unit_vectors)
+    print(f'{filename_with_extension} has {circled_ratio:.2f} circled ratio.')
+
     marked_acute_image = tv_processer.mark_curvature_points(curvature_points, radius=5, color=(255, 0, 0))
-    save_path = compute_save_path(image_path, 'circled')
+    save_path = compute_save_path(image_path, f'{circled_ratio:.2f}')
     io.imsave(save_path, marked_acute_image)
 
 
 if __name__ == '__main__':
-    image_path = 'data/Sample_imgs/TV_processed/907_bloodvessel.png'
-    circle_tv(image_path)
+    directory = 'data/Sample_imgs/TV_processed/'
+    for filename in os.listdir(directory):
+        image_path = os.path.join(directory, filename)
+        circle_tv(image_path)
