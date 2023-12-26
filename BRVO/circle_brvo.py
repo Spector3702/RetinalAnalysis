@@ -4,13 +4,7 @@ import numpy as np
 from PIL import Image
 from skimage import util
 
-from common import compute_save_path
-
-
-def read_ptl_gray_image(image_path):
-    img = Image.open(image_path)
-    gray_img = img.convert('L')
-    return img, gray_img
+from common import compute_save_path, read_ptl_gray_image, bitwise_and_mask
 
 
 def subtract_bv(gray_original_img, gray_blood_vessel_img):
@@ -19,24 +13,8 @@ def subtract_bv(gray_original_img, gray_blood_vessel_img):
     return subtracted_img
 
 
-def bitwise_and_mask(img, dark_threshold, light_threshold):
-    lighter_mask = img > dark_threshold
-    darker_mask = img < light_threshold
-    return np.bitwise_and(lighter_mask, darker_mask)
-
-
 def distance_from_center(point, center):
     return np.sqrt((point[0] - center[0]) ** 2 + (point[1] - center[1]) ** 2)
-
-
-def get_contour_center(contour):
-    M = cv2.moments(contour)
-    if M["m00"] != 0:
-        cX = int(M["m10"] / M["m00"])
-        cY = int(M["m01"] / M["m00"])
-    else:
-        cX, cY = 0, 0
-    return cX, cY
 
 
 def avg(points):

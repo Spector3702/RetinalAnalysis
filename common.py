@@ -1,6 +1,9 @@
 import os
 import re
+import cv2
+import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
 
 
 def plot_image(image, title=None):
@@ -40,3 +43,15 @@ def compute_save_path(image_path, sub_name):
 
     os.makedirs(new_directory, exist_ok=True)
     return save_path
+
+
+def read_ptl_gray_image(image_path):
+    img = Image.open(image_path)
+    gray_img = img.convert('L')
+    return img, gray_img
+
+
+def bitwise_and_mask(img, dark_threshold, light_threshold):
+    lighter_mask = img > dark_threshold
+    darker_mask = img < light_threshold
+    return np.bitwise_and(lighter_mask, darker_mask)
