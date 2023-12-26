@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 from PIL import Image
@@ -87,6 +88,16 @@ def circle_brvo(original_path, blood_vessel_path):
 
 
 if __name__ == '__main__':
-    original_path = 'data/Sample_imgs/BRVO/734.png'
-    blood_vessel_path = 'data/Sample_imgs/BRVO_processed/734_bloodvessel.png'
-    circle_brvo(original_path, blood_vessel_path)
+    org_dir = 'data/Sample_imgs/BRVO'
+    processed_bv_dir = 'data/Sample_imgs/BRVO_processed'
+
+    for org_img_filename in os.listdir(org_dir):
+        original_path = os.path.join(org_dir, org_img_filename)
+        
+        bv_img_filename = org_img_filename.split('.')[0] + '_bloodvessel.png'
+        blood_vessel_path = os.path.join(processed_bv_dir, bv_img_filename)
+
+        if os.path.exists(blood_vessel_path):
+            circle_brvo(original_path, blood_vessel_path)
+        else:
+            print(f"No corresponding blood vessel image found for {org_img_filename}")
