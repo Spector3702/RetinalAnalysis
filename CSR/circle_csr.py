@@ -1,8 +1,9 @@
+import os
 import cv2
 import numpy as np
 from sklearn.cluster import DBSCAN
 
-from common import compute_save_path, read_ptl_gray_image, bitwise_and_mask, plot_image
+from common import compute_save_path, read_ptl_gray_image, bitwise_and_mask
 
 
 def erase_bv(gray_org_img, gray_bv_img, inpaint_radius=3):
@@ -70,13 +71,17 @@ def cluster_largest_cnts(contours, epsilon, min_samples):
 
 
 def draw_convex_hull_of_contours(image, contours):
-    all_points = np.vstack(contours).squeeze()
-    hull = cv2.convexHull(all_points)
-    
-    hull_img = image.copy()
-    cv2.drawContours(hull_img, [hull], -1, (255), 10)
+    if contours and all(isinstance(contour, np.ndarray) for contour in contours):
+        all_points = np.vstack(contours).squeeze()
+        hull = cv2.convexHull(all_points)
+        
+        hull_img = image.copy()
+        cv2.drawContours(hull_img, [hull], -1, (255, 0, 0), 10)  # Change color to (255, 0, 0) for visibility
 
-    return hull_img
+        return hull_img
+    else:
+        print("No valid contours provided.")
+        return image
 
 
 def circle_csr(org_path, bv_path):
@@ -102,9 +107,20 @@ def circle_csr(org_path, bv_path):
     save_path = compute_save_path(bv_path, 'circle')
     original_with_contours = cv2.cvtColor(hull_img, cv2.COLOR_RGB2BGR)
     cv2.imwrite(save_path, original_with_contours)
+    print(f'Save img: {save_path}')
 
 
 if __name__ == '__main__':
-    original_path = 'data/Sample_imgs/CSR/814.png'
-    blood_vessel_path = 'data/Sample_imgs/CSR_processed/814_bloodvessel.png'
-    circle_csr(original_path, blood_vessel_path)
+    org_dir = 'data/Sample_imgs/CSR'
+    processed_bv_dir = 'data/Sample_imgs/CSR_processed'
+
+    for org_img_filename in os.listdir(org_dir):
+        original_path = os.path.join(org_dir, org_img_filename)
+        
+        bv_img_filename = org_img_filename.split('.')[0] + '_bloodvessel.png'
+        blood_vessel_path = os.path.join(processed_bv_dir, bv_img_filename)
+
+        if os.path.exists(blood_vessel_path):
+            circle_csr(original_path, blood_vessel_path)
+        else:
+            print(f"No corresponding blood vessel image found for {org_img_filename}")
