@@ -106,5 +106,5 @@ data/Training_Set/*
 data/Test_Set/*
 
 # Model
-retinal_model.**
-retinal_model/
+retinal_model**.**
+retinal_model**/
